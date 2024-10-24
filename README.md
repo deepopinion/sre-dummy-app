@@ -24,3 +24,5 @@ To run the application just run:
 ```shell
 $ PYTHONPATH=$(pwd)/src uvicorn sre.main:app
 ```
+
+Then just hit `http://localhost:8000/docs` to see the OpenAPI docs.
