@@ -19,6 +19,9 @@ $ pytest tests/
 
 ## Running
 
+> [!WARNING]
+> The `/image-hasher` endpoint will eat about 10G of your RAM!
+
 To run the application just run:
 
 ```shell
