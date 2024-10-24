@@ -2,14 +2,16 @@ import hashlib
 import io
 import os
 import time
+from typing import Any
 
+import pandas as pd
 import requests
 from fastapi import APIRouter
 
 
 IMAGE_URL = (
     "https://www.nasa.gov/wp-content/uploads/2024/10/iss072e034554orig.jpg")
-ITERATIONS = 1000
+ITERATIONS = 500
 
 
 router = APIRouter()
@@ -21,17 +23,26 @@ def health() -> dict[str, bool]:
 
 
 @router.get("/image-hasher")
-def image_hasher() -> dict[str, str]:
+def image_hasher() -> dict[str, Any]:
     response = requests.get(IMAGE_URL)
     response.raise_for_status()
 
     buffer = io.BytesIO()
+    randomized: list[bytes] = []
 
     for i in range(ITERATIONS):
-        buffer.write(response.content + os.getrandom(i))
+        iteration_random = response.content + os.getrandom(i)
+        buffer.write(iteration_random)
+        randomized.append(iteration_random)
 
-    result = hashlib.sha512(buffer.getvalue()).hexdigest()
+    overall_hash = hashlib.md5(buffer.getvalue()).hexdigest()
+    df = pd.DataFrame({
+        "randomized": [hash(r) for r in randomized],
+    })
 
-    time.sleep(10)
+    time.sleep(5)
 
-    return {"result": result}
+    return {
+        "overall_hash": overall_hash,
+        "dataframe": df.to_dict(),
+    }
